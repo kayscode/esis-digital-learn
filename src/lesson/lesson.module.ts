@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { LessonResolver } from './lesson.resolver';
-import { Lesson } from './lesson.entity';
+import { Lesson } from './lesson.document';
 import { LessonService } from './lesson.service';
 
 import { TypeOrmModule } from "@nestjs/typeorm"

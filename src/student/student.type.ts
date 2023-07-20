@@ -18,4 +18,7 @@ export class StudentType{
     @Field()
     email : string;
 
+    @Field( type => ID)
+    id : string;
+
 }

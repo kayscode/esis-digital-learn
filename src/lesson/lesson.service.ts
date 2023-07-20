@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Lesson } from './lesson.entity';
+import { Lesson } from './lesson.document';
 import { InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {v4 as uuid} from "uuid";
@@ -7,6 +7,7 @@ import { CreateLessonInput } from 'src/inputs/create-lesson.input';
 import { Args, Mutation } from '@nestjs/graphql';
 import { LessonType } from './lesson.type';
 import { StudentService } from 'src/student/student.service';
+import { AddStudentsToLessonClassInput } from 'src/inputs/add-students-to-lesson.input';
 
 
 @Injectable()
@@ -41,26 +42,32 @@ export class LessonService {
 
     async createLesson( createLessonInput : CreateLessonInput)
     {
-        const { name , startDate, endDate } = createLessonInput;
+        const { name , startDate, endDate, students } = createLessonInput;
         const id = uuid()
         const lesson = this.lessonRepository.create({
-            id,name,startDate,endDate
+            id,name,startDate,endDate,students
         });
 
         return this.lessonRepository.save(lesson);
     }
 
-    @Mutation(returns => LessonType)
-    async addStudentToLessonClass(
-        @Args("lessonClassCode") lessonClassCode:string,
-        @Args("studentMat") studentMatricule : string,
-        studentService : StudentService
-    )
-    {
-        const lesson = await this.lessonRepository.findOne({where : { id : lessonClassCode}});
-        const student = await studentService.findStudent(studentMatricule);
+    // @Mutation(returns => LessonType)
+    // async addStudentToLessonClass(
+    //     @Args("lessonClassCode") lessonClassCode:string,
+    //     @Args("studentMat") studentsMatricule : string[],
+    //     studentService : StudentService
+    // )
+    // {
+    //     const lesson = await this.lessonRepository.findOne({where : { id : lessonClassCode}});
+    //     lesson.students = [...studentsMatricule]
+    //     return await this.lessonRepository.save(lesson);
+    // }
 
-        lesson.students = [ student]
+    async assignStudents( addStudentToLessonClass : AddStudentsToLessonClassInput)
+    {
+        const {lessonClassCode, studentsMatricule} = addStudentToLessonClass;
+        const lesson = await this.getLesson(lessonClassCode);
+        lesson.students = [...studentsMatricule]
         return await this.lessonRepository.save(lesson);
     }
 }

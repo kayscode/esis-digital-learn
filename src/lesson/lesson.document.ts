@@ -19,6 +19,6 @@ export class Lesson{
     @Column()
     endDate : string;
 
-    @Column((type) => Student)
-    students : Student[];
+    @Column()
+    students : string[];
 }
